@@ -93,6 +93,30 @@ class Connexion {
     }
 	
     /**
+     * démarre une transaction PDO
+     * @return bool
+     */
+    public function beginTransaction(): bool {
+        return $this->conn->beginTransaction();
+    }
+
+    /**
+     * valide la transaction en cours
+     * @return bool
+     */
+    public function commit(): bool {
+        return $this->conn->commit();
+    }
+
+    /**
+     * annule la transaction en cours
+     * @return bool
+     */
+    public function rollBack(): bool {
+        return $this->conn->rollBack();
+    }
+
+    /**
      * prépare la requête
      * @param string $requete
      * @param array|null $param

@@ -1,15 +1,34 @@
+Options +FollowSymLinks
 RewriteEngine on
+RewriteBase /rest_mediatekdocuments/
+
+# GET /table
 RewriteCond %{REQUEST_METHOD} =GET
-RewriteRule ^([a-zA-Z0-9_]+)$ src/index.php?table=$1 [B,L]
+RewriteRule ^([a-zA-Z0-9_-]+)$ src/index.php?table=$1 [B,QSA,L]
+# GET /table/{id}
 RewriteCond %{REQUEST_METHOD} =GET
-RewriteRule ^([a-zA-Z0-9_]+)/({.*})$ src/index.php?table=$1&champs=$2 [B,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)$ src/index.php?table=$1&id=$2 [B,QSA,L]
+# GET /table/{champs json}
+RewriteCond %{REQUEST_METHOD} =GET
+RewriteRule ^([a-zA-Z0-9_-]+)/({.*})$ src/index.php?table=$1&champs=$2 [B,QSA,L]
+
+# POST /table
 RewriteCond %{REQUEST_METHOD} =POST
-RewriteRule ^([a-zA-Z0-9_]+)$ src/index.php?table=$1 [B,L]
+RewriteRule ^([a-zA-Z0-9_-]+)$ src/index.php?table=$1 [B,QSA,L]
+
+# PUT /table
 RewriteCond %{REQUEST_METHOD} =PUT
-RewriteRule ^([a-zA-Z0-9_]+)$ src/index.php?table=$1 [B,L]
+RewriteRule ^([a-zA-Z0-9_-]+)$ src/index.php?table=$1 [B,QSA,L]
+# PUT /table/{id}
 RewriteCond %{REQUEST_METHOD} =PUT
-RewriteRule ^([a-zA-Z0-9_]+)/([a-zA-Z0-9]+)$ src/index.php?table=$1&id=$2 [B,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)$ src/index.php?table=$1&id=$2 [B,QSA,L]
+
+# DELETE /table
 RewriteCond %{REQUEST_METHOD} =DELETE
-RewriteRule ^([a-zA-Z0-9_]+)$ src/index.php?table=$1 [B,L]
+RewriteRule ^([a-zA-Z0-9_-]+)$ src/index.php?table=$1 [B,QSA,L]
+# DELETE /table/{id}
 RewriteCond %{REQUEST_METHOD} =DELETE
-RewriteRule ^([a-zA-Z0-9_]+)/({.*})$ src/index.php?table=$1&champs=$2 [B,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)$ src/index.php?table=$1&id=$2 [B,QSA,L]
+# DELETE /table/{champs json}
+RewriteCond %{REQUEST_METHOD} =DELETE
+RewriteRule ^([a-zA-Z0-9_-]+)/({.*})$ src/index.php?table=$1&champs=$2 [B,QSA,L]

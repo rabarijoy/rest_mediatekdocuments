@@ -63,6 +63,12 @@ class MyAccessBDD extends AccessBDD {
      */	
     protected function traitementInsert(string $table, ?array $champs) : ?int{
         switch($table){
+            case "livre" :
+                return $this->ajouterLivre($champs ?? []);
+            case "dvd" :
+                return $this->ajouterDvd($champs ?? []);
+            case "revue" :
+                return $this->ajouterRevue($champs ?? []);
             case "" :
                 // return $this->uneFonction(parametres);
             default:                    
@@ -81,6 +87,12 @@ class MyAccessBDD extends AccessBDD {
      */	
     protected function traitementUpdate(string $table, ?string $id, ?array $champs) : ?int{
         switch($table){
+            case "livre" :
+                return $this->modifierLivre($id ?? '', $champs ?? []);
+            case "dvd" :
+                return $this->modifierDvd($id ?? '', $champs ?? []);
+            case "revue" :
+                return $this->modifierRevue($id ?? '', $champs ?? []);
             case "" :
                 // return $this->uneFonction(parametres);
             default:                    
@@ -98,14 +110,559 @@ class MyAccessBDD extends AccessBDD {
      */	
     protected function traitementDelete(string $table, ?array $champs) : ?int{
         switch($table){
+            case "livre" :
+                return $this->supprimerLivre($champs ?? []);
+            case "dvd" :
+                return $this->supprimerDvd($champs ?? []);
+            case "revue" :
+                return $this->supprimerRevue($champs ?? []);
             case "" :
                 // return $this->uneFonction(parametres);
             default:                    
                 // cas général
                 return $this->deleteTuplesOneTable($table, $champs);	
         }
-    }	    
-        
+    }
+
+    // =========================================================================
+    // LIVRE : ajout, modification, suppression multi-tables
+    // =========================================================================
+
+    /**
+     * insère un livre dans les tables document, livres_dvd et livre (transaction)
+     * @param array $champs
+     * @return int|null 1 si succès, null si erreur ou champ manquant
+     */
+    private function ajouterLivre(array $champs): ?int {
+        $required = ['id', 'titre', 'image', 'idRayon', 'idPublic', 'idGenre', 'ISBN', 'auteur', 'collection'];
+        foreach ($required as $key) {
+            if (!array_key_exists($key, $champs)) {
+                return null;
+            }
+        }
+        try {
+            $this->conn->beginTransaction();
+
+            $resDoc = $this->conn->updateBDD(
+                "INSERT INTO document (id, titre, image, idRayon, idPublic, idGenre) "
+                . "VALUES (:id, :titre, :image, :idRayon, :idPublic, :idGenre)",
+                [
+                    'id'       => $champs['id'],
+                    'titre'    => $champs['titre'],
+                    'image'    => $champs['image'],
+                    'idRayon'  => $champs['idRayon'],
+                    'idPublic' => $champs['idPublic'],
+                    'idGenre'  => $champs['idGenre'],
+                ]
+            );
+            if ($resDoc === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $resLd = $this->conn->updateBDD(
+                "INSERT INTO livres_dvd (id) VALUES (:id)",
+                ['id' => $champs['id']]
+            );
+            if ($resLd === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $resLivre = $this->conn->updateBDD(
+                "INSERT INTO livre (id, ISBN, auteur, collection) VALUES (:id, :ISBN, :auteur, :collection)",
+                [
+                    'id'         => $champs['id'],
+                    'ISBN'       => $champs['ISBN'],
+                    'auteur'     => $champs['auteur'],
+                    'collection' => $champs['collection'],
+                ]
+            );
+            if ($resLivre === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $this->conn->commit();
+            return 1;
+        } catch (\Exception $e) {
+            $this->conn->rollBack();
+            return null;
+        }
+    }
+
+    /**
+     * modifie un livre dans les tables document et livre (transaction)
+     * @param string $id
+     * @param array $champs
+     * @return int|null somme des rowCount ou null si erreur
+     */
+    private function modifierLivre(string $id, array $champs): ?int {
+        if (empty($id) || empty($champs)) {
+            return null;
+        }
+        try {
+            $this->conn->beginTransaction();
+
+            $resDoc = $this->conn->updateBDD(
+                "UPDATE document SET titre=:titre, image=:image, idRayon=:idRayon, "
+                . "idPublic=:idPublic, idGenre=:idGenre WHERE id=:id",
+                [
+                    'titre'    => $champs['titre']    ?? null,
+                    'image'    => $champs['image']    ?? null,
+                    'idRayon'  => $champs['idRayon']  ?? null,
+                    'idPublic' => $champs['idPublic'] ?? null,
+                    'idGenre'  => $champs['idGenre']  ?? null,
+                    'id'       => $id,
+                ]
+            );
+            if ($resDoc === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $resLivre = $this->conn->updateBDD(
+                "UPDATE livre SET ISBN=:ISBN, auteur=:auteur, collection=:collection WHERE id=:id",
+                [
+                    'ISBN'       => $champs['ISBN']       ?? null,
+                    'auteur'     => $champs['auteur']     ?? null,
+                    'collection' => $champs['collection'] ?? null,
+                    'id'         => $id,
+                ]
+            );
+            if ($resLivre === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $this->conn->commit();
+            return $resDoc + $resLivre;
+        } catch (\Exception $e) {
+            $this->conn->rollBack();
+            return null;
+        }
+    }
+
+    /**
+     * supprime un livre des tables livre, livres_dvd et document (transaction)
+     * Refuse si des exemplaires ou commandes existent pour ce livre.
+     * @param array $champs doit contenir 'id'
+     * @return int|null 1 si succès, null si contrainte non respectée ou erreur
+     */
+    private function supprimerLivre(array $champs): ?int {
+        if (!array_key_exists('id', $champs)) {
+            return null;
+        }
+        $id = $champs['id'];
+
+        $resExemplaires = $this->conn->queryBDD(
+            "SELECT COUNT(*) as nb FROM exemplaire WHERE id=:id",
+            ['id' => $id]
+        );
+        if ($resExemplaires === null || (int)$resExemplaires[0]['nb'] > 0) {
+            return null;
+        }
+
+        $resCommandes = $this->conn->queryBDD(
+            "SELECT COUNT(*) as nb FROM commandedocument WHERE idLivreDvd=:id",
+            ['id' => $id]
+        );
+        if ($resCommandes === null || (int)$resCommandes[0]['nb'] > 0) {
+            return null;
+        }
+
+        try {
+            $this->conn->beginTransaction();
+
+            $resLivre = $this->conn->updateBDD(
+                "DELETE FROM livre WHERE id=:id",
+                ['id' => $id]
+            );
+            if ($resLivre === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $resLd = $this->conn->updateBDD(
+                "DELETE FROM livres_dvd WHERE id=:id",
+                ['id' => $id]
+            );
+            if ($resLd === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $resDoc = $this->conn->updateBDD(
+                "DELETE FROM document WHERE id=:id",
+                ['id' => $id]
+            );
+            if ($resDoc === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $this->conn->commit();
+            return 1;
+        } catch (\Exception $e) {
+            $this->conn->rollBack();
+            return null;
+        }
+    }
+
+    // =========================================================================
+    // DVD : ajout, modification, suppression multi-tables
+    // =========================================================================
+
+    /**
+     * insère un dvd dans les tables document, livres_dvd et dvd (transaction)
+     * @param array $champs
+     * @return int|null 1 si succès, null si erreur ou champ manquant
+     */
+    private function ajouterDvd(array $champs): ?int {
+        $required = ['id', 'titre', 'image', 'idRayon', 'idPublic', 'idGenre', 'synopsis', 'realisateur', 'duree'];
+        foreach ($required as $key) {
+            if (!array_key_exists($key, $champs)) {
+                return null;
+            }
+        }
+        try {
+            $this->conn->beginTransaction();
+
+            $resDoc = $this->conn->updateBDD(
+                "INSERT INTO document (id, titre, image, idRayon, idPublic, idGenre) "
+                . "VALUES (:id, :titre, :image, :idRayon, :idPublic, :idGenre)",
+                [
+                    'id'       => $champs['id'],
+                    'titre'    => $champs['titre'],
+                    'image'    => $champs['image'],
+                    'idRayon'  => $champs['idRayon'],
+                    'idPublic' => $champs['idPublic'],
+                    'idGenre'  => $champs['idGenre'],
+                ]
+            );
+            if ($resDoc === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $resLd = $this->conn->updateBDD(
+                "INSERT INTO livres_dvd (id) VALUES (:id)",
+                ['id' => $champs['id']]
+            );
+            if ($resLd === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $resDvd = $this->conn->updateBDD(
+                "INSERT INTO dvd (id, synopsis, realisateur, duree) VALUES (:id, :synopsis, :realisateur, :duree)",
+                [
+                    'id'          => $champs['id'],
+                    'synopsis'    => $champs['synopsis'],
+                    'realisateur' => $champs['realisateur'],
+                    'duree'       => (int)$champs['duree'],
+                ]
+            );
+            if ($resDvd === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $this->conn->commit();
+            return 1;
+        } catch (\Exception $e) {
+            $this->conn->rollBack();
+            return null;
+        }
+    }
+
+    /**
+     * modifie un dvd dans les tables document et dvd (transaction)
+     * @param string $id
+     * @param array $champs
+     * @return int|null somme des rowCount ou null si erreur
+     */
+    private function modifierDvd(string $id, array $champs): ?int {
+        if (empty($id) || empty($champs)) {
+            return null;
+        }
+        try {
+            $this->conn->beginTransaction();
+
+            $resDoc = $this->conn->updateBDD(
+                "UPDATE document SET titre=:titre, image=:image, idRayon=:idRayon, "
+                . "idPublic=:idPublic, idGenre=:idGenre WHERE id=:id",
+                [
+                    'titre'    => $champs['titre']    ?? null,
+                    'image'    => $champs['image']    ?? null,
+                    'idRayon'  => $champs['idRayon']  ?? null,
+                    'idPublic' => $champs['idPublic'] ?? null,
+                    'idGenre'  => $champs['idGenre']  ?? null,
+                    'id'       => $id,
+                ]
+            );
+            if ($resDoc === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $resDvd = $this->conn->updateBDD(
+                "UPDATE dvd SET synopsis=:synopsis, realisateur=:realisateur, duree=:duree WHERE id=:id",
+                [
+                    'synopsis'    => $champs['synopsis']    ?? null,
+                    'realisateur' => $champs['realisateur'] ?? null,
+                    'duree'       => isset($champs['duree']) ? (int)$champs['duree'] : null,
+                    'id'          => $id,
+                ]
+            );
+            if ($resDvd === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $this->conn->commit();
+            return $resDoc + $resDvd;
+        } catch (\Exception $e) {
+            $this->conn->rollBack();
+            return null;
+        }
+    }
+
+    /**
+     * supprime un dvd des tables dvd, livres_dvd et document (transaction)
+     * Refuse si des exemplaires ou commandes existent pour ce dvd.
+     * @param array $champs doit contenir 'id'
+     * @return int|null 1 si succès, null si contrainte non respectée ou erreur
+     */
+    private function supprimerDvd(array $champs): ?int {
+        if (!array_key_exists('id', $champs)) {
+            return null;
+        }
+        $id = $champs['id'];
+
+        $resExemplaires = $this->conn->queryBDD(
+            "SELECT COUNT(*) as nb FROM exemplaire WHERE id=:id",
+            ['id' => $id]
+        );
+        if ($resExemplaires === null || (int)$resExemplaires[0]['nb'] > 0) {
+            return null;
+        }
+
+        $resCommandes = $this->conn->queryBDD(
+            "SELECT COUNT(*) as nb FROM commandedocument WHERE idLivreDvd=:id",
+            ['id' => $id]
+        );
+        if ($resCommandes === null || (int)$resCommandes[0]['nb'] > 0) {
+            return null;
+        }
+
+        try {
+            $this->conn->beginTransaction();
+
+            $resDvd = $this->conn->updateBDD(
+                "DELETE FROM dvd WHERE id=:id",
+                ['id' => $id]
+            );
+            if ($resDvd === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $resLd = $this->conn->updateBDD(
+                "DELETE FROM livres_dvd WHERE id=:id",
+                ['id' => $id]
+            );
+            if ($resLd === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $resDoc = $this->conn->updateBDD(
+                "DELETE FROM document WHERE id=:id",
+                ['id' => $id]
+            );
+            if ($resDoc === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $this->conn->commit();
+            return 1;
+        } catch (\Exception $e) {
+            $this->conn->rollBack();
+            return null;
+        }
+    }
+
+    // =========================================================================
+    // REVUE : ajout, modification, suppression multi-tables
+    // =========================================================================
+
+    /**
+     * insère une revue dans les tables document et revue (transaction)
+     * @param array $champs
+     * @return int|null 1 si succès, null si erreur ou champ manquant
+     */
+    private function ajouterRevue(array $champs): ?int {
+        $required = ['id', 'titre', 'image', 'idRayon', 'idPublic', 'idGenre', 'periodicite', 'delaiMiseADispo'];
+        foreach ($required as $key) {
+            if (!array_key_exists($key, $champs)) {
+                return null;
+            }
+        }
+        try {
+            $this->conn->beginTransaction();
+
+            $resDoc = $this->conn->updateBDD(
+                "INSERT INTO document (id, titre, image, idRayon, idPublic, idGenre) "
+                . "VALUES (:id, :titre, :image, :idRayon, :idPublic, :idGenre)",
+                [
+                    'id'       => $champs['id'],
+                    'titre'    => $champs['titre'],
+                    'image'    => $champs['image'],
+                    'idRayon'  => $champs['idRayon'],
+                    'idPublic' => $champs['idPublic'],
+                    'idGenre'  => $champs['idGenre'],
+                ]
+            );
+            if ($resDoc === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $resRevue = $this->conn->updateBDD(
+                "INSERT INTO revue (id, periodicite, delaiMiseADispo) VALUES (:id, :periodicite, :delaiMiseADispo)",
+                [
+                    'id'              => $champs['id'],
+                    'periodicite'     => $champs['periodicite'],
+                    'delaiMiseADispo' => $champs['delaiMiseADispo'],
+                ]
+            );
+            if ($resRevue === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $this->conn->commit();
+            return 1;
+        } catch (\Exception $e) {
+            $this->conn->rollBack();
+            return null;
+        }
+    }
+
+    /**
+     * modifie une revue dans les tables document et revue (transaction)
+     * @param string $id
+     * @param array $champs
+     * @return int|null somme des rowCount ou null si erreur
+     */
+    private function modifierRevue(string $id, array $champs): ?int {
+        if (empty($id) || empty($champs)) {
+            return null;
+        }
+        try {
+            $this->conn->beginTransaction();
+
+            $resDoc = $this->conn->updateBDD(
+                "UPDATE document SET titre=:titre, image=:image, idRayon=:idRayon, "
+                . "idPublic=:idPublic, idGenre=:idGenre WHERE id=:id",
+                [
+                    'titre'    => $champs['titre']    ?? null,
+                    'image'    => $champs['image']    ?? null,
+                    'idRayon'  => $champs['idRayon']  ?? null,
+                    'idPublic' => $champs['idPublic'] ?? null,
+                    'idGenre'  => $champs['idGenre']  ?? null,
+                    'id'       => $id,
+                ]
+            );
+            if ($resDoc === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $resRevue = $this->conn->updateBDD(
+                "UPDATE revue SET periodicite=:periodicite, delaiMiseADispo=:delaiMiseADispo WHERE id=:id",
+                [
+                    'periodicite'     => $champs['periodicite']     ?? null,
+                    'delaiMiseADispo' => $champs['delaiMiseADispo'] ?? null,
+                    'id'              => $id,
+                ]
+            );
+            if ($resRevue === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $this->conn->commit();
+            return $resDoc + $resRevue;
+        } catch (\Exception $e) {
+            $this->conn->rollBack();
+            return null;
+        }
+    }
+
+    /**
+     * supprime une revue des tables revue et document (transaction)
+     * Refuse si des exemplaires ou abonnements existent pour cette revue.
+     * @param array $champs doit contenir 'id'
+     * @return int|null 1 si succès, null si contrainte non respectée ou erreur
+     */
+    private function supprimerRevue(array $champs): ?int {
+        if (!array_key_exists('id', $champs)) {
+            return null;
+        }
+        $id = $champs['id'];
+
+        $resExemplaires = $this->conn->queryBDD(
+            "SELECT COUNT(*) as nb FROM exemplaire WHERE id=:id",
+            ['id' => $id]
+        );
+        if ($resExemplaires === null || (int)$resExemplaires[0]['nb'] > 0) {
+            return null;
+        }
+
+        $resAbonnements = $this->conn->queryBDD(
+            "SELECT COUNT(*) as nb FROM abonnement WHERE idRevue=:id",
+            ['id' => $id]
+        );
+        if ($resAbonnements === null || (int)$resAbonnements[0]['nb'] > 0) {
+            return null;
+        }
+
+        try {
+            $this->conn->beginTransaction();
+
+            $resRevue = $this->conn->updateBDD(
+                "DELETE FROM revue WHERE id=:id",
+                ['id' => $id]
+            );
+            if ($resRevue === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $resDoc = $this->conn->updateBDD(
+                "DELETE FROM document WHERE id=:id",
+                ['id' => $id]
+            );
+            if ($resDoc === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $this->conn->commit();
+            return 1;
+        } catch (\Exception $e) {
+            $this->conn->rollBack();
+            return null;
+        }
+    }
+
+    // =========================================================================
+    // Méthodes génériques (inchangées)
+    // =========================================================================
+
     /**
      * récupère les tuples d'une seule table
      * @param string $table
