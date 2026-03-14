@@ -25,6 +25,10 @@ if (!$url->authentification()){
     $table = $url->recupVariable("table");
     $id = $url->recupVariable("id");
     $champs = $url->recupVariable("champs", "json");
+    // pour DELETE /table/{id} : l'id vient du chemin URL, pas des champs
+    if ($methodeHTTP === 'DELETE' && !empty($id) && empty($champs)) {
+        $champs = ['id' => $id];
+    }
     // demande au controleur de traiter la demande
     $controle->demande($methodeHTTP, $table, $id, $champs);
 }
