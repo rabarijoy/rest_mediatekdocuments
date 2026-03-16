@@ -760,7 +760,7 @@ class MyAccessBDD extends AccessBDD {
             return null;
         }
         return $this->conn->updateBDD(
-            "UPDATE commandedocument SET idSuivi = :idSuivi WHERE id = :id",
+            "UPDATE commandedocument SET idSuivi = :idSuivi WHERE id COLLATE utf8mb4_0900_ai_ci = :id",
             [
                 'idSuivi' => $champs['idSuivi'],
                 'id'      => $id,
@@ -781,7 +781,7 @@ class MyAccessBDD extends AccessBDD {
         $id = $champs['id'];
 
         $resSuivi = $this->conn->queryBDD(
-            "SELECT idSuivi FROM commandedocument WHERE id = :id",
+            "SELECT idSuivi FROM commandedocument WHERE id COLLATE utf8mb4_0900_ai_ci = :id",
             ['id' => $id]
         );
         if ($resSuivi === null || empty($resSuivi)) {
@@ -796,7 +796,7 @@ class MyAccessBDD extends AccessBDD {
             $this->conn->beginTransaction();
 
             $resCd = $this->conn->updateBDD(
-                "DELETE FROM commandedocument WHERE id = :id",
+                "DELETE FROM commandedocument WHERE id COLLATE utf8mb4_0900_ai_ci = :id",
                 ['id' => $id]
             );
             if ($resCd === null) {
