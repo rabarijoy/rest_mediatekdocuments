@@ -17,9 +17,9 @@ INSERT IGNORE INTO suivi (id, libelle) VALUES
 ('00003', 'Livrée'),
 ('00004', 'Réglée');
 
--- 3. Ajouter la colonne idSuivi à commandedocument (si elle n'existe pas encore)
--- Exécuter UNIQUEMENT si la colonne n'existe pas déjà :
---   ALTER TABLE commandedocument ADD COLUMN idSuivi varchar(5) NOT NULL DEFAULT '00001';
+-- 3. Forcer le charset/collation de idSuivi pour qu'il corresponde à suivi.id
+ALTER TABLE commandedocument
+  MODIFY COLUMN idSuivi varchar(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '00001';
 
 -- 4. Ajouter la contrainte FK
 ALTER TABLE commandedocument
