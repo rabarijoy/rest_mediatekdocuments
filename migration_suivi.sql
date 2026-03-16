@@ -19,7 +19,7 @@ INSERT IGNORE INTO suivi (id, libelle) VALUES
 
 -- 3. Ajouter la colonne idSuivi à commandedocument
 ALTER TABLE commandedocument
-  ADD COLUMN IF NOT EXISTS idSuivi varchar(5) NOT NULL DEFAULT '00001';
+  ADD COLUMN idSuivi varchar(5) NOT NULL DEFAULT '00001';
 
 -- 4. Ajouter la contrainte FK (ignorer si elle existe déjà)
 ALTER TABLE commandedocument
