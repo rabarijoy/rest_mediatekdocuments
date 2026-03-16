@@ -686,10 +686,10 @@ class MyAccessBDD extends AccessBDD {
             return null;
         }
         $requete = "SELECT cd.id, c.dateCommande, c.montant, cd.nbExemplaire, cd.idSuivi, "
-                 . "s.libelle as libelleEtape "
+                 . "s.libelle as libelleEtape, cd.idLivreDvd "
                  . "FROM commandedocument cd "
                  . "JOIN commande c ON cd.id = c.id "
-                 . "JOIN suivi s ON cd.idSuivi = s.id "
+                 . "LEFT JOIN suivi s ON cd.idSuivi = s.id "
                  . "WHERE cd.idLivreDvd = :idLivreDvd "
                  . "ORDER BY c.dateCommande DESC";
         return $this->conn->queryBDD($requete, ['idLivreDvd' => $champs['idLivreDvd']]);
