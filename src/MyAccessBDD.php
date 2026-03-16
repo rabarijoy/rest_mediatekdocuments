@@ -702,12 +702,13 @@ class MyAccessBDD extends AccessBDD {
      * @return int|null 1 si succès, null si champ manquant ou erreur
      */
     private function ajouterCommandeDocument(array $champs): ?int {
-        $required = ['idCommande', 'dateCommande', 'montant', 'nbExemplaire', 'idLivreDvd', 'idSuivi'];
+        $required = ['idCommande', 'dateCommande', 'montant', 'nbExemplaire', 'idLivreDvd'];
         foreach ($required as $key) {
             if (!array_key_exists($key, $champs)) {
                 return null;
             }
         }
+        $idSuivi = $champs['idSuivi'] ?? '00001';
         try {
             $this->conn->beginTransaction();
 
@@ -732,7 +733,7 @@ class MyAccessBDD extends AccessBDD {
                     'id'           => $champs['idCommande'],
                     'nbExemplaire' => (int)$champs['nbExemplaire'],
                     'idLivreDvd'   => $champs['idLivreDvd'],
-                    'idSuivi'      => $champs['idSuivi'],
+                    'idSuivi'      => $idSuivi,
                 ]
             );
             if ($resDoc === null) {
