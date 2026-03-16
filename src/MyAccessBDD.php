@@ -688,7 +688,7 @@ class MyAccessBDD extends AccessBDD {
         $requete = "SELECT cd.id, c.dateCommande, c.montant, cd.nbExemplaire, cd.idSuivi, "
                  . "s.libelle as libelleEtape, cd.idLivreDvd "
                  . "FROM commandedocument cd "
-                 . "JOIN commande c ON cd.id = c.id "
+                 . "JOIN commande c ON cd.id COLLATE utf8mb4_0900_ai_ci = c.id "
                  . "LEFT JOIN suivi s ON cd.idSuivi = s.id "
                  . "WHERE cd.idLivreDvd = :idLivreDvd "
                  . "ORDER BY c.dateCommande DESC";
