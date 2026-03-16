@@ -17,7 +17,11 @@ INSERT IGNORE INTO suivi (id, libelle) VALUES
 ('00003', 'Livrée'),
 ('00004', 'Réglée');
 
--- 3. Forcer le charset/collation de idSuivi pour qu'il corresponde à suivi.id
+-- 3a. Aligner suivi.id en utf8mb4_general_ci
+ALTER TABLE suivi
+  MODIFY COLUMN id varchar(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL;
+
+-- 3b. Aligner commandedocument.idSuivi en utf8mb4_general_ci
 ALTER TABLE commandedocument
   MODIFY COLUMN idSuivi varchar(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '00001';
 
