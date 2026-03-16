@@ -17,14 +17,17 @@ INSERT IGNORE INTO suivi (id, libelle) VALUES
 ('00003', 'Livrée'),
 ('00004', 'Réglée');
 
--- 3a. Aligner suivi.id en utf8mb4_general_ci
+-- 3a. Supprimer la mauvaise FK existante (commandedocument.id → suivi.id)
+ALTER TABLE commandedocument DROP FOREIGN KEY fk_commandedocument_suivi;
+
+-- 3b. Aligner suivi.id sur la collation de toute la BDD (utf8mb4_0900_ai_ci)
 ALTER TABLE suivi
-  MODIFY COLUMN id varchar(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL;
+  MODIFY COLUMN id varchar(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL;
 
--- 3b. Aligner commandedocument.idSuivi en utf8mb4_general_ci
+-- 3c. Aligner commandedocument.idSuivi sur la même collation
 ALTER TABLE commandedocument
-  MODIFY COLUMN idSuivi varchar(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '00001';
+  MODIFY COLUMN idSuivi varchar(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '00001';
 
--- 4. Ajouter la contrainte FK
+-- 4. Ajouter la bonne FK : commandedocument.idSuivi → suivi.id
 ALTER TABLE commandedocument
   ADD CONSTRAINT commandedocument_ibfk_3 FOREIGN KEY (idSuivi) REFERENCES suivi (id);
