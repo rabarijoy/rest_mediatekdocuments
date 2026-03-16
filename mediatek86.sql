@@ -54,7 +54,8 @@ CREATE TABLE commande (
 CREATE TABLE commandedocument (
   id varchar(5) NOT NULL,
   nbExemplaire int(11) DEFAULT NULL,
-  idLivreDvd varchar(10) NOT NULL
+  idLivreDvd varchar(10) NOT NULL,
+  idSuivi varchar(5) NOT NULL DEFAULT '00001'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -381,6 +382,27 @@ INSERT INTO rayon (id, libelle) VALUES
 -- --------------------------------------------------------
 
 --
+-- Structure de la table suivi
+--
+
+CREATE TABLE suivi (
+  id varchar(5) NOT NULL,
+  libelle varchar(30) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Déchargement des données de la table suivi
+--
+
+INSERT INTO suivi (id, libelle) VALUES
+('00001', 'En cours'),
+('00002', 'Relancée'),
+('00003', 'Livrée'),
+('00004', 'Réglée');
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table revue
 --
 
@@ -496,6 +518,12 @@ ALTER TABLE revue
   ADD PRIMARY KEY (id);
 
 --
+-- Index pour la table suivi
+--
+ALTER TABLE suivi
+  ADD PRIMARY KEY (id);
+
+--
 -- Contraintes pour les tables déchargées
 --
 
@@ -511,7 +539,8 @@ ALTER TABLE abonnement
 --
 ALTER TABLE commandedocument
   ADD CONSTRAINT commandedocument_ibfk_1 FOREIGN KEY (id) REFERENCES commande (id),
-  ADD CONSTRAINT commandedocument_ibfk_2 FOREIGN KEY (idLivreDvd) REFERENCES livres_dvd (id);
+  ADD CONSTRAINT commandedocument_ibfk_2 FOREIGN KEY (idLivreDvd) REFERENCES livres_dvd (id),
+  ADD CONSTRAINT commandedocument_ibfk_3 FOREIGN KEY (idSuivi) REFERENCES suivi (id);
 
 --
 -- Contraintes pour la table document
