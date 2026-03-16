@@ -17,10 +17,10 @@ INSERT IGNORE INTO suivi (id, libelle) VALUES
 ('00003', 'Livrée'),
 ('00004', 'Réglée');
 
--- 3. Ajouter la colonne idSuivi à commandedocument
-ALTER TABLE commandedocument
-  ADD COLUMN idSuivi varchar(5) NOT NULL DEFAULT '00001';
+-- 3. Ajouter la colonne idSuivi à commandedocument (si elle n'existe pas encore)
+-- Exécuter UNIQUEMENT si la colonne n'existe pas déjà :
+--   ALTER TABLE commandedocument ADD COLUMN idSuivi varchar(5) NOT NULL DEFAULT '00001';
 
--- 4. Ajouter la contrainte FK (ignorer si elle existe déjà)
+-- 4. Ajouter la contrainte FK
 ALTER TABLE commandedocument
   ADD CONSTRAINT commandedocument_ibfk_3 FOREIGN KEY (idSuivi) REFERENCES suivi (id);
