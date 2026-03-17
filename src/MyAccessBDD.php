@@ -688,7 +688,7 @@ class MyAccessBDD extends AccessBDD {
         $requete = "SELECT cd.id, c.dateCommande, c.montant, cd.nbExemplaire, cd.idSuivi, "
                  . "s.libelle as libelleEtape, cd.idLivreDvd "
                  . "FROM commandedocument cd "
-                 . "JOIN commande c ON cd.id COLLATE utf8mb4_0900_ai_ci = c.id "
+                 . "JOIN commande c ON cd.id = c.id "
                  . "LEFT JOIN suivi s ON cd.idSuivi = s.id "
                  . "WHERE cd.idLivreDvd = :idLivreDvd "
                  . "ORDER BY c.dateCommande DESC";
@@ -760,7 +760,7 @@ class MyAccessBDD extends AccessBDD {
             return null;
         }
         return $this->conn->updateBDD(
-            "UPDATE commandedocument SET idSuivi = :idSuivi WHERE id COLLATE utf8mb4_0900_ai_ci = :id",
+            "UPDATE commandedocument SET idSuivi = :idSuivi WHERE id = :id",
             [
                 'idSuivi' => $champs['idSuivi'],
                 'id'      => $id,
@@ -781,7 +781,7 @@ class MyAccessBDD extends AccessBDD {
         $id = $champs['id'];
 
         $resSuivi = $this->conn->queryBDD(
-            "SELECT idSuivi FROM commandedocument WHERE id COLLATE utf8mb4_0900_ai_ci = :id",
+            "SELECT idSuivi FROM commandedocument WHERE id = :id",
             ['id' => $id]
         );
         if ($resSuivi === null || empty($resSuivi)) {
@@ -796,7 +796,7 @@ class MyAccessBDD extends AccessBDD {
             $this->conn->beginTransaction();
 
             $resCd = $this->conn->updateBDD(
-                "DELETE FROM commandedocument WHERE id COLLATE utf8mb4_0900_ai_ci = :id",
+                "DELETE FROM commandedocument WHERE id = :id",
                 ['id' => $id]
             );
             if ($resCd === null) {
