@@ -29,8 +29,12 @@ class Connexion {
      */
     private function __construct(string $login, string $pwd, string $bd, string $server, string $port){
         try {
-            $this->conn = new \PDO("mysql:host=$server;dbname=$bd;port=$port", $login, $pwd);
-            $this->conn->query('SET CHARACTER SET utf8');
+            $this->conn = new \PDO(
+                "mysql:host=$server;dbname=$bd;port=$port;charset=utf8mb4",
+                $login,
+                $pwd
+            );
+            $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch (\Exception $e) {
             throw $e;
         }
@@ -61,13 +65,10 @@ class Connexion {
     public function updateBDD(string $requete, ?array $param=null) : ?int{
         try{
             $result = $this->prepareRequete($requete, $param);
-            $reponse = $result->execute();
-            if($reponse === true){
-                return $result->rowCount();
-            }else{
-                return null;
-            }
+            $result->execute();
+            return $result->rowCount();
         }catch(Exception $e){
+            error_log("[updateBDD] " . $e->getMessage() . " | SQL: " . $requete . " | params: " . json_encode($param));
             return null;
         }
     }
@@ -81,13 +82,10 @@ class Connexion {
     public function queryBDD(string $requete, ?array $param=null) : ?array{     
         try{
             $result = $this->prepareRequete($requete, $param);
-            $reponse = $result->execute();
-            if($reponse === true){
-                return $result->fetchAll(PDO::FETCH_ASSOC);
-            }else{
-                return null;
-            } 
+            $result->execute();
+            return $result->fetchAll(PDO::FETCH_ASSOC);
         }catch(Exception $e){
+            error_log("[queryBDD] " . $e->getMessage() . " | SQL: " . $requete . " | params: " . json_encode($param));
             return null;
         }
     }
