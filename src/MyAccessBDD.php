@@ -40,6 +40,13 @@ class MyAccessBDD extends AccessBDD {
                 return $this->selectAllRevues();
             case "exemplaire" :
                 return $this->selectExemplairesRevue($champs);
+            case "commandedocument" :
+                if (!empty($champs)) {
+                    return $this->selectCommandesLivreDvd($champs);
+                }
+                return $this->selectTuplesOneTable($table, $champs);
+            case "suivi" :
+                return $this->selectSuivi();
             case "genre" :
             case "public" :
             case "rayon" :
@@ -69,6 +76,8 @@ class MyAccessBDD extends AccessBDD {
                 return $this->ajouterDvd($champs ?? []);
             case "revue" :
                 return $this->ajouterRevue($champs ?? []);
+            case "commandedocument" :
+                return $this->ajouterCommandeDocument($champs ?? []);
             case "" :
                 // return $this->uneFonction(parametres);
             default:                    
@@ -93,6 +102,8 @@ class MyAccessBDD extends AccessBDD {
                 return $this->modifierDvd($id ?? '', $champs ?? []);
             case "revue" :
                 return $this->modifierRevue($id ?? '', $champs ?? []);
+            case "commandedocument" :
+                return $this->modifierEtapeSuivi($id ?? '', $champs ?? []);
             case "" :
                 // return $this->uneFonction(parametres);
             default:                    
@@ -116,6 +127,8 @@ class MyAccessBDD extends AccessBDD {
                 return $this->supprimerDvd($champs ?? []);
             case "revue" :
                 return $this->supprimerRevue($champs ?? []);
+            case "commandedocument" :
+                return $this->supprimerCommandeDocument($champs ?? []);
             case "" :
                 // return $this->uneFonction(parametres);
             default:                    
@@ -657,6 +670,167 @@ class MyAccessBDD extends AccessBDD {
             $this->conn->rollBack();
             return null;
         }
+    }
+
+    // =========================================================================
+    // COMMANDE DOCUMENT : sélection, ajout, modification de l'étape, suppression
+    // =========================================================================
+
+    /**
+     * récupère toutes les commandes d'un livre ou DVD avec le libellé de l'étape de suivi
+     * @param array $champs doit contenir 'idLivreDvd'
+     * @return array|null tableau de résultats ou null si champ manquant
+     */
+    private function selectCommandesLivreDvd(array $champs): ?array {
+        if (!array_key_exists('idLivreDvd', $champs)) {
+            return null;
+        }
+        $requete = "SELECT cd.id, c.dateCommande, c.montant, cd.nbExemplaire, cd.idSuivi, "
+                 . "s.libelle as libelleEtape, cd.idLivreDvd "
+                 . "FROM commandedocument cd "
+                 . "JOIN commande c ON cd.id = c.id "
+                 . "LEFT JOIN suivi s ON cd.idSuivi = s.id "
+                 . "WHERE cd.idLivreDvd = :idLivreDvd "
+                 . "ORDER BY c.dateCommande DESC";
+        return $this->conn->queryBDD($requete, ['idLivreDvd' => $champs['idLivreDvd']]);
+    }
+
+    /**
+     * insère une commande de document dans les tables commande et commandedocument (transaction)
+     * L'étape de suivi est initialisée à '00001' (en cours de traitement).
+     * @param array $champs doit contenir : idCommande, dateCommande, montant, nbExemplaire, idLivreDvd
+     * @return int|null 1 si succès, null si champ manquant ou erreur
+     */
+    private function ajouterCommandeDocument(array $champs): ?int {
+        $required = ['idCommande', 'dateCommande', 'montant', 'nbExemplaire', 'idLivreDvd'];
+        foreach ($required as $key) {
+            if (!array_key_exists($key, $champs)) {
+                return null;
+            }
+        }
+        $idSuivi = $champs['idSuivi'] ?? '00001';
+        try {
+            $this->conn->beginTransaction();
+
+            $resCommande = $this->conn->updateBDD(
+                "INSERT INTO commande (id, dateCommande, montant) "
+                . "VALUES (:id, :dateCommande, :montant)",
+                [
+                    'id'           => $champs['idCommande'],
+                    'dateCommande' => $champs['dateCommande'],
+                    'montant'      => $champs['montant'],
+                ]
+            );
+            if ($resCommande === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $resDoc = $this->conn->updateBDD(
+                "INSERT INTO commandedocument (id, nbExemplaire, idLivreDvd, idSuivi) "
+                . "VALUES (:id, :nbExemplaire, :idLivreDvd, :idSuivi)",
+                [
+                    'id'           => $champs['idCommande'],
+                    'nbExemplaire' => (int)$champs['nbExemplaire'],
+                    'idLivreDvd'   => $champs['idLivreDvd'],
+                    'idSuivi'      => $idSuivi,
+                ]
+            );
+            if ($resDoc === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $this->conn->commit();
+            return 1;
+        } catch (\Exception $e) {
+            $this->conn->rollBack();
+            return null;
+        }
+    }
+
+    /**
+     * met à jour l'étape de suivi d'une commande de document
+     * @param string $id identifiant de la commande
+     * @param array $champs doit contenir 'idSuivi'
+     * @return int|null rowCount ou null si champ manquant ou erreur
+     */
+    private function modifierEtapeSuivi(string $id, array $champs): ?int {
+        if (empty($id) || !array_key_exists('idSuivi', $champs)) {
+            return null;
+        }
+        return $this->conn->updateBDD(
+            "UPDATE commandedocument SET idSuivi = :idSuivi WHERE id = :id",
+            [
+                'idSuivi' => $champs['idSuivi'],
+                'id'      => $id,
+            ]
+        );
+    }
+
+    /**
+     * supprime une commande de document des tables commandedocument et commande (transaction)
+     * Refuse si la commande est déjà livrée ('00003') ou réglée ('00004').
+     * @param array $champs doit contenir 'id'
+     * @return int|null 1 si succès, null si contrainte non respectée ou erreur
+     */
+    private function supprimerCommandeDocument(array $champs): ?int {
+        if (!array_key_exists('id', $champs)) {
+            return null;
+        }
+        $id = $champs['id'];
+
+        $resSuivi = $this->conn->queryBDD(
+            "SELECT idSuivi FROM commandedocument WHERE id = :id",
+            ['id' => $id]
+        );
+        if ($resSuivi === null || empty($resSuivi)) {
+            return null;
+        }
+        $idSuivi = $resSuivi[0]['idSuivi'];
+        if (in_array($idSuivi, ['00003', '00004'])) {
+            return null;
+        }
+
+        try {
+            $this->conn->beginTransaction();
+
+            $resCd = $this->conn->updateBDD(
+                "DELETE FROM commandedocument WHERE id = :id",
+                ['id' => $id]
+            );
+            if ($resCd === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $resC = $this->conn->updateBDD(
+                "DELETE FROM commande WHERE id = :id",
+                ['id' => $id]
+            );
+            if ($resC === null) {
+                $this->conn->rollBack();
+                return null;
+            }
+
+            $this->conn->commit();
+            return 1;
+        } catch (\Exception $e) {
+            $this->conn->rollBack();
+            return null;
+        }
+    }
+
+    // =========================================================================
+    // SUIVI : sélection
+    // =========================================================================
+
+    /**
+     * récupère toutes les étapes de suivi triées par identifiant
+     * @return array|null
+     */
+    private function selectSuivi(): ?array {
+        return $this->conn->queryBDD("SELECT * FROM suivi ORDER BY id");
     }
 
     // =========================================================================
