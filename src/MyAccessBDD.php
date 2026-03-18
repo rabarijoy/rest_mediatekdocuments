@@ -39,7 +39,10 @@ class MyAccessBDD extends AccessBDD {
             case "revue" :
                 return $this->selectAllRevues();
             case "exemplaire" :
-                return $this->selectExemplairesRevue($champs);
+                if (!empty($champs)) {
+                    return $this->selectExemplairesDocument($champs);
+                }
+                return $this->selectTuplesOneTable($table, $champs);
             case "commandedocument" :
                 if (!empty($champs)) {
                     return $this->selectCommandesLivreDvd($champs);
@@ -113,6 +116,8 @@ class MyAccessBDD extends AccessBDD {
                 return $this->modifierRevue($id ?? '', $champs ?? []);
             case "commandedocument" :
                 return $this->modifierEtapeSuivi($id ?? '', $champs ?? []);
+            case "exemplaire" :
+                return $this->modifierEtatExemplaire($id ?? '', $champs ?? []);
             case "" :
                 // return $this->uneFonction(parametres);
             default:                    
@@ -140,6 +145,8 @@ class MyAccessBDD extends AccessBDD {
                 return $this->supprimerCommandeDocument($champs ?? []);
             case "abonnement" :
                 return $this->supprimerAbonnement($champs ?? []);
+            case "exemplaire" :
+                return $this->supprimerExemplaire($champs ?? []);
             case "" :
                 // return $this->uneFonction(parametres);
             default:                    
@@ -1136,24 +1143,67 @@ class MyAccessBDD extends AccessBDD {
         return $this->conn->queryBDD($requete);
     }	
 
+    // =========================================================================
+    // EXEMPLAIRE : sélection enrichie, modification de l'état, suppression
+    // =========================================================================
+
     /**
-     * récupère tous les exemplaires d'une revue
-     * @param array|null $champs 
+     * récupère tous les exemplaires d'un document (livre, DVD ou revue)
+     * avec le libellé de l'état, triés par date d'achat décroissante
+     * (remplace selectExemplairesRevue, désormais utilisée pour tous les documents)
+     * @param array $champs doit contenir 'id' (identifiant du document parent)
      * @return array|null
      */
-    private function selectExemplairesRevue(?array $champs) : ?array{
-        if(empty($champs)){
+    private function selectExemplairesDocument(array $champs): ?array {
+        if (!array_key_exists('id', $champs)) {
             return null;
         }
-        if(!array_key_exists('id', $champs)){
+        $requete = "SELECT e.id, e.numero, e.dateAchat, e.photo, e.idEtat, et.libelle as libelleEtat "
+                 . "FROM exemplaire e "
+                 . "JOIN etat et ON e.idEtat = et.id "
+                 . "WHERE e.id = :id "
+                 . "ORDER BY e.dateAchat DESC";
+        return $this->conn->queryBDD($requete, ['id' => $champs['id']]);
+    }
+
+    /**
+     * modifie l'état d'un exemplaire identifié par l'id du document et son numéro
+     * @param string $id identifiant du document parent (passé dans l'URL)
+     * @param array $champs doit contenir 'numero' et 'idEtat'
+     * @return int|null rowCount ou null si champ manquant ou erreur
+     */
+    private function modifierEtatExemplaire(string $id, array $champs): ?int {
+        if (empty($id)
+            || !array_key_exists('numero', $champs)
+            || !array_key_exists('idEtat', $champs)) {
             return null;
         }
-        $champNecessaire['id'] = $champs['id'];
-        $requete = "Select e.id, e.numero, e.dateAchat, e.photo, e.idEtat ";
-        $requete .= "from exemplaire e join document d on e.id=d.id ";
-        $requete .= "where e.id = :id ";
-        $requete .= "order by e.dateAchat DESC";
-        return $this->conn->queryBDD($requete, $champNecessaire);
-    }		    
-    
+        return $this->conn->updateBDD(
+            "UPDATE exemplaire SET idEtat = :idEtat WHERE id = :idDoc AND numero = :numero",
+            [
+                'idEtat'  => $champs['idEtat'],
+                'idDoc'   => $id,
+                'numero'  => (int)$champs['numero'],
+            ]
+        );
+    }
+
+    /**
+     * supprime un exemplaire identifié par l'id du document et son numéro
+     * @param array $champs doit contenir 'id' (idDocument) et 'numero'
+     * @return int|null rowCount ou null si champ manquant ou erreur
+     */
+    private function supprimerExemplaire(array $champs): ?int {
+        if (!array_key_exists('id', $champs) || !array_key_exists('numero', $champs)) {
+            return null;
+        }
+        return $this->conn->updateBDD(
+            "DELETE FROM exemplaire WHERE id = :id AND numero = :numero",
+            [
+                'id'     => $champs['id'],
+                'numero' => (int)$champs['numero'],
+            ]
+        );
+    }
+
 }
