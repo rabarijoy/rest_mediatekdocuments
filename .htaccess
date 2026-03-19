@@ -2,6 +2,10 @@ Options +FollowSymLinks
 RewriteEngine on
 RewriteBase /rest_mediatekdocuments/
 
+# Refuser l'accès direct à la racine sans paramètre de route
+RewriteCond %{REQUEST_URI} ^/rest_mediatekdocuments/?$
+RewriteRule ^ - [R=400,L]
+
 # GET /table
 RewriteCond %{REQUEST_METHOD} =GET
 RewriteRule ^([a-zA-Z0-9_-]+)$ src/index.php?table=$1 [B,QSA,L]
