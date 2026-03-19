@@ -57,6 +57,13 @@ class MyAccessBDD extends AccessBDD {
                 return $this->selectTuplesOneTable($table, $champs);
             case "abonnementexpiration" :
                 return $this->selectAbonnementsExpirantBientot();
+            case "utilisateur" :
+                if (!empty($champs)) {
+                    return $this->connexionUtilisateur($champs);
+                }
+                return $this->selectTuplesOneTable($table, $champs);
+            case "service" :
+                return $this->selectTuplesOneTable($table, $champs);
             case "genre" :
             case "public" :
             case "rayon" :
@@ -974,6 +981,35 @@ class MyAccessBDD extends AccessBDD {
             $this->conn->rollBack();
             return null;
         }
+    }
+
+    // =========================================================================
+    // UTILISATEUR : connexion
+    // =========================================================================
+
+    /**
+     * vérifie les identifiants d'un utilisateur et retourne ses informations
+     * Les mots de passe sont stockés en clair dans la base (conformément aux instructions).
+     * @param array $champs doit contenir 'login' et 'pwd'
+     * @return array|null tableau associatif (id, login, idService, libelleService)
+     *                    ou null si identifiants incorrects ou champ manquant
+     */
+    private function connexionUtilisateur(array $champs): ?array {
+        if (!array_key_exists('login', $champs) || !array_key_exists('pwd', $champs)) {
+            return null;
+        }
+        $requete = "SELECT u.id, u.login, u.idService, s.libelle as libelleService "
+                 . "FROM utilisateur u "
+                 . "JOIN service s ON u.idService = s.id "
+                 . "WHERE u.login = :login AND u.pwd = :pwd";
+        $result = $this->conn->queryBDD($requete, [
+            'login' => $champs['login'],
+            'pwd'   => $champs['pwd'],
+        ]);
+        if (empty($result)) {
+            return null;
+        }
+        return $result;
     }
 
     // =========================================================================
