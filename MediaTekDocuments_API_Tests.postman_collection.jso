@@ -1,0 +1,1817 @@
+{
+  "info": {
+    "_postman_id": "07d390b7-e2b0-428f-aceb-34f387b1c91a",
+    "name": "MediaTekDocuments API Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "52788406",
+    "_collection_link": "https://go.postman.co/collection/52788406-07d390b7-e2b0-428f-aceb-34f387b1c91a?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "GET /genre",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Common envelope checks",
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  json = pm.response.json();",
+              "  pm.expect(json).to.be.ok;",
+              "});",
+              "",
+              "pm.test(\"Response envelope has code/message/result\", function () {",
+              "  if (!json) json = pm.response.json();",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code is 200\", function () {",
+              "  if (!json) json = pm.response.json();",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              "",
+              "// Endpoint-specific: /genre GET -> result non empty (array non empty OR string non empty)",
+              "pm.test(\"/genre result is non-empty\", function () {",
+              "  if (!json) json = pm.response.json();",
+              "  const r = json.result;",
+              "",
+              "  const isNonEmptyArray = Array.isArray(r) && r.length > 0;",
+              "  const isNonEmptyString = (typeof r === 'string') && r.trim().length > 0;",
+              "",
+              "  pm.expect(isNonEmptyArray || isNonEmptyString, \"result should be a non-empty array or non-empty string\").to.be.true;",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/genre",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "genre"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request GET 'http://localhost/rest_mediatekdocuments/genre' --user 'admin:adminpwd'"
+      },
+      "response": []
+    },
+    {
+      "name": "GET /public",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/public",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "public"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request GET 'http://localhost/rest_mediatekdocuments/public' --user 'admin:adminpwd'"
+      },
+      "response": []
+    },
+    {
+      "name": "GET /rayon",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/rayon",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "rayon"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request GET 'http://localhost/rest_mediatekdocuments/rayon' --user 'admin:adminpwd'"
+      },
+      "response": []
+    },
+    {
+      "name": "GET /etat",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/etat",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "etat"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request GET 'http://localhost/rest_mediatekdocuments/etat' --user 'admin:adminpwd'"
+      },
+      "response": []
+    },
+    {
+      "name": "GET /suivi",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              "",
+              "// Endpoint-specific constraint: /suivi GET => 4 étapes (si result array => length===4)",
+              "pm.test(\"/suivi has 4 steps when result is an array\", function () {",
+              "  const r = json.result;",
+              "  if (Array.isArray(r)) {",
+              "    pm.expect(r.length, \"result array length\").to.eql(4);",
+              "  } else {",
+              "    // tolerate other shapes, but keep envelope checks above",
+              "    pm.expect(true).to.eql(true);",
+              "  }",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/suivi",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "suivi"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request GET 'http://localhost/rest_mediatekdocuments/suivi' --user 'admin:adminpwd'"
+      },
+      "response": []
+    },
+    {
+      "name": "GET /livre",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              "",
+              "// Endpoint-specific constraint: /livre GET => au moins 1 livre (si result array => length>=1)",
+              "pm.test(\"/livre has at least 1 item when result is an array\", function () {",
+              "  const r = json.result;",
+              "  if (Array.isArray(r)) {",
+              "    pm.expect(r.length, \"result array length\").to.be.at.least(1);",
+              "  } else {",
+              "    // tolerate other shapes, but keep envelope checks above",
+              "    pm.expect(true).to.eql(true);",
+              "  }",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/livre",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "livre"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request GET 'http://localhost/rest_mediatekdocuments/livre' --user 'admin:adminpwd'"
+      },
+      "response": []
+    },
+    {
+      "name": "POST /livre",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              "",
+              "// Endpoint-specific constraint: POST /livre => result == 1 (number 1 or string \"1\")",
+              "pm.test(\"POST /livre result indicates success\", function () {",
+              "  pm.expect(String(json.result)).to.eql(\"1\");",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "disabled": false
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"id\":\"TST01\",\"titre\":\"Test\",\"image\":\"\",\"idRayon\":\"00001\",\"idPublic\":\"00001\",\"idGenre\":\"00001\",\"ISBN\":\"000\",\"auteur\":\"Auteur\",\"collection\":\"Col\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/livre",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "livre"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request POST 'http://localhost/rest_mediatekdocuments/livre' --user 'admin:adminpwd' --header 'Content-Type: application/json' --data-raw '{\"id\":\"TST01\",\"titre\":\"Test\",\"image\":\"\",\"idRayon\":\"00001\",\"idPublic\":\"00001\",\"idGenre\":\"00001\",\"ISBN\":\"000\",\"auteur\":\"Auteur\",\"collection\":\"Col\"}'"
+      },
+      "response": []
+    },
+    {
+      "name": "PUT /livre/:livreId",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "disabled": false
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titre\":\"Test modifié\",\"image\":\"\",\"idRayon\":\"00001\",\"idPublic\":\"00001\",\"idGenre\":\"00001\",\"ISBN\":\"000\",\"auteur\":\"Auteur\",\"collection\":\"Col\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/livre/TST01",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "livre",
+            "TST01"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request PUT 'http://localhost/rest_mediatekdocuments/livre/TST01' --user 'admin:adminpwd' --header 'Content-Type: application/json' --data-raw '{\"titre\":\"Test modifié\",\"image\":\"\",\"idRayon\":\"00001\",\"idPublic\":\"00001\",\"idGenre\":\"00001\",\"ISBN\":\"000\",\"auteur\":\"Auteur\",\"collection\":\"Col\"}'"
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE /livre/{\"id\":\"{{livreId}}\"}",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/livre/{\"id\":\"TST01\"}",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "livre",
+            "{\"id\":\"TST01\"}"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request DELETE 'http://localhost/rest_mediatekdocuments/livre/{\"id\":\"TST01\"}' --user 'admin:adminpwd'"
+      },
+      "response": []
+    },
+    {
+      "name": "GET /dvd",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/dvd",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "dvd"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request GET 'http://localhost/rest_mediatekdocuments/dvd' --user 'admin:adminpwd'"
+      },
+      "response": []
+    },
+    {
+      "name": "POST /dvd",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              "",
+              "// Same as livre: POST success result == 1",
+              "pm.test(\"POST /dvd result indicates success\", function () {",
+              "  pm.expect(String(json.result)).to.eql(\"1\");",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "disabled": false
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"id\":\"TST02\",\"titre\":\"Test DVD\",\"image\":\"\",\"idRayon\":\"00001\",\"idPublic\":\"00001\",\"idGenre\":\"00001\",\"duree\":90,\"realisateur\":\"Real\",\"synopsis\":\"Syn\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/dvd",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "dvd"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request POST 'http://localhost/rest_mediatekdocuments/dvd' --user 'admin:adminpwd' --header 'Content-Type: application/json' --data-raw '{\"id\":\"TST02\",\"titre\":\"Test DVD\",\"image\":\"\",\"idRayon\":\"00001\",\"idPublic\":\"00001\",\"idGenre\":\"00001\",\"duree\":90,\"realisateur\":\"Real\",\"synopsis\":\"Syn\"}'"
+      },
+      "response": []
+    },
+    {
+      "name": "PUT /dvd/:dvdId",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "disabled": false
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titre\":\"Test DVD modifié\",\"image\":\"\",\"idRayon\":\"00001\",\"idPublic\":\"00001\",\"idGenre\":\"00001\",\"duree\":90,\"realisateur\":\"Real\",\"synopsis\":\"Syn\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/dvd/TST02",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "dvd",
+            "TST02"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request PUT 'http://localhost/rest_mediatekdocuments/dvd/TST02' --user 'admin:adminpwd' --header 'Content-Type: application/json' --data-raw '{\"titre\":\"Test DVD modifié\",\"image\":\"\",\"idRayon\":\"00001\",\"idPublic\":\"00001\",\"idGenre\":\"00001\",\"duree\":90,\"realisateur\":\"Real\",\"synopsis\":\"Syn\"}'"
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE /dvd/{\"id\":\"{{dvdId}}\"}",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/dvd/{\"id\":\"TST02\"}",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "dvd",
+            "{\"id\":\"TST02\"}"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request DELETE 'http://localhost/rest_mediatekdocuments/dvd/{\"id\":\"TST02\"}' --user 'admin:adminpwd'"
+      },
+      "response": []
+    },
+    {
+      "name": "GET /revue",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/revue",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "revue"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request GET 'http://localhost/rest_mediatekdocuments/revue' --user 'admin:adminpwd'"
+      },
+      "response": []
+    },
+    {
+      "name": "POST /revue",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              "",
+              "// Same as livre: POST success result == 1",
+              "pm.test(\"POST /revue result indicates success\", function () {",
+              "  pm.expect(String(json.result)).to.eql(\"1\");",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "disabled": false
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"id\":\"TST03\",\"titre\":\"Test Revue\",\"image\":\"\",\"idRayon\":\"00001\",\"idPublic\":\"00001\",\"idGenre\":\"00001\",\"periodicite\":\"Mensuelle\",\"delaiMiseADispo\":30}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/revue",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "revue"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request POST 'http://localhost/rest_mediatekdocuments/revue' --user 'admin:adminpwd' --header 'Content-Type: application/json' --data-raw '{\"id\":\"TST03\",\"titre\":\"Test Revue\",\"image\":\"\",\"idRayon\":\"00001\",\"idPublic\":\"00001\",\"idGenre\":\"00001\",\"periodicite\":\"Mensuelle\",\"delaiMiseADispo\":30}'"
+      },
+      "response": []
+    },
+    {
+      "name": "PUT /revue/:revueId",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "disabled": false
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titre\":\"Test Revue modifiée\",\"image\":\"\",\"idRayon\":\"00001\",\"idPublic\":\"00001\",\"idGenre\":\"00001\",\"periodicite\":\"Bimestrielle\",\"delaiMiseADispo\":15}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/revue/TST03",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "revue",
+            "TST03"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request PUT 'http://localhost/rest_mediatekdocuments/revue/TST03' --user 'admin:adminpwd' --header 'Content-Type: application/json' --data-raw '{\"titre\":\"Test Revue modifiée\",\"image\":\"\",\"idRayon\":\"00001\",\"idPublic\":\"00001\",\"idGenre\":\"00001\",\"periodicite\":\"Bimestrielle\",\"delaiMiseADispo\":15}'"
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE /revue/{\"id\":\"{{revueId}}\"}",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/revue/{\"id\":\"TST03\"}",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "revue",
+            "{\"id\":\"TST03\"}"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request DELETE 'http://localhost/rest_mediatekdocuments/revue/{\"id\":\"TST03\"}' --user 'admin:adminpwd'"
+      },
+      "response": []
+    },
+    {
+      "name": "GET /exemplaire/{\"id\":\"{{exemplaireId}}\"}",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/exemplaire/{\"id\":\"00001\"}",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "exemplaire",
+            "{\"id\":\"00001\"}"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request GET 'http://localhost/rest_mediatekdocuments/exemplaire/{\"id\":\"00001\"}' --user 'admin:adminpwd'"
+      },
+      "response": []
+    },
+    {
+      "name": "GET /commandedocument/{\"idLivreDvd\":\"{{idLivreDvd}}\"}",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/commandedocument/{\"idLivreDvd\":\"00001\"}",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "commandedocument",
+            "{\"idLivreDvd\":\"00001\"}"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request GET 'http://localhost/rest_mediatekdocuments/commandedocument/{\"idLivreDvd\":\"00001\"}' --user 'admin:adminpwd'"
+      },
+      "response": []
+    },
+    {
+      "name": "POST /commandedocument",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "disabled": false
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"idCommande\":\"C9999\",\"dateCommande\":\"2024-01-01\",\"montant\":10.00,\"nbExemplaire\":1,\"idLivreDvd\":\"00001\",\"idSuivi\":\"00001\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/commandedocument",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "commandedocument"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request POST 'http://localhost/rest_mediatekdocuments/commandedocument' --user 'admin:adminpwd' --header 'Content-Type: application/json' --data-raw '{\"idCommande\":\"C9999\",\"dateCommande\":\"2024-01-01\",\"montant\":10.00,\"nbExemplaire\":1,\"idLivreDvd\":\"00001\",\"idSuivi\":\"00001\"}'"
+      },
+      "response": []
+    },
+    {
+      "name": "PUT /commandedocument/:commandeDocumentId",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "disabled": false
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"idSuivi\":\"00002\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/commandedocument/C9999",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "commandedocument",
+            "C9999"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request PUT 'http://localhost/rest_mediatekdocuments/commandedocument/C9999' --user 'admin:adminpwd' --header 'Content-Type: application/json' --data-raw '{\"idSuivi\":\"00002\"}'"
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE /commandedocument/{\"id\":\"{{commandeDocumentId}}\"}",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/commandedocument/{\"id\":\"C9999\"}",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "commandedocument",
+            "{\"id\":\"C9999\"}"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request DELETE 'http://localhost/rest_mediatekdocuments/commandedocument/{\"id\":\"C9999\"}' --user 'admin:adminpwd'"
+      },
+      "response": []
+    },
+    {
+      "name": "GET /abonnement/{\"idRevue\":\"{{revueId}}\"}",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/abonnement/{\"idRevue\":\"00001\"}",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "abonnement",
+            "{\"idRevue\":\"00001\"}"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request GET 'http://localhost/rest_mediatekdocuments/abonnement/{\"idRevue\":\"00001\"}' --user 'admin:adminpwd'"
+      },
+      "response": []
+    },
+    {
+      "name": "GET /abonnementexpiration",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "adminpwd",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/abonnementexpiration",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "abonnementexpiration"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request GET 'http://localhost/rest_mediatekdocuments/abonnementexpiration' --user 'admin:adminpwd'"
+      },
+      "response": []
+    },
+    {
+      "name": "GET /utilisateur/{\"login\":\"{{login}}\",\"pwd\":\"{{pwd}}\"}",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let json;",
+              "pm.test(\"Response is valid JSON\", function () {",
+              "  pm.expect(() => { json = pm.response.json(); }).to.not.throw();",
+              "});",
+              "",
+              "pm.test(\"JSON has expected envelope (code, message, result)\", function () {",
+              "  pm.expect(json).to.be.an(\"object\");",
+              "  pm.expect(json).to.have.property(\"code\");",
+              "  pm.expect(json).to.have.property(\"message\");",
+              "  pm.expect(json).to.have.property(\"result\");",
+              "});",
+              "",
+              "pm.test(\"Envelope code == 200\", function () {",
+              "  pm.expect(json.code).to.eql(200);",
+              "});",
+              "",
+              "// Endpoint-specific constraint: /utilisateur GET => idService non vide",
+              "pm.test(\"/utilisateur result contains idService\", function () {",
+              "  const r = json.result;",
+              "  if (Array.isArray(r)) {",
+              "    pm.expect(r.some(x => x && x.idService), \"at least one element with idService\").to.eql(true);",
+              "  } else if (r && typeof r === \"object\") {",
+              "    pm.expect(r.idService, \"result.idService\").to.be.ok;",
+              "  } else {",
+              "    pm.expect.fail(\"Expected result to be an object or an array\");",
+              "  }",
+              "});",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/rest_mediatekdocuments/utilisateur/{\"login\":\"{{login}}\",\"pwd\":\"{{pwd}}\"}",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "rest_mediatekdocuments",
+            "utilisateur",
+            "{\"login\":\"{{login}}\",\"pwd\":\"{{pwd}}\"}"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request GET 'http://localhost/rest_mediatekdocuments/utilisateur/{\"login\":\"admin\",\"pwd\":\"adminpwd\"}' --user 'admin:adminpwd'"
+      },
+      "response": []
+    }
+  ]
+}
