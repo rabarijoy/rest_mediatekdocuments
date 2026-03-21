@@ -101,19 +101,30 @@ class Url {
     }
 
     /**
-     * compare le user/pwd reçu en 'basic auth' 
-     * avec le user/pwd dans les variables d'environnement
+     * compare le user/pwd reçu avec le user/pwd dans les variables d'environnement.
+     * Vérifie en priorité l'en-tête Authorization HTTP Basic standard ($_SERVER['PHP_AUTH_USER']).
+     * Si vide (certains hébergeurs perdent cet en-tête), utilise en fallback les en-têtes
+     * personnalisés X-Auth-User et X-Auth-Pass envoyés par le client C#.
      * @return bool true si authentification réussie
      */
     private function basicAuthentification() : bool{
         // récupère les variables d'environnement de l'authentification
         $expectedUser = htmlspecialchars($_ENV['AUTH_USER'] ?? '');
-        $expectedPw = htmlspecialchars($_ENV['AUTH_PW'] ?? '');  
-        // récupère les variables envoyées en 'basic auth'
+        $expectedPw = htmlspecialchars($_ENV['AUTH_PW'] ?? '');
+
+        // Priorité 1 : HTTP Basic Authorization standard
         $authUser = htmlspecialchars($_SERVER['PHP_AUTH_USER'] ?? '');
-        $authPw = htmlspecialchars($_SERVER['PHP_AUTH_PW'] ?? '');    
+        $authPw   = htmlspecialchars($_SERVER['PHP_AUTH_PW']   ?? '');
+
+        // Priorité 2 (fallback) : en-têtes personnalisés X-Auth-User / X-Auth-Pass
+        // PHP expose les en-têtes HTTP sous la forme HTTP_<NOM_EN_MAJUSCULES_TIRETS_EN_UNDERSCORES>
+        if (empty($authUser)) {
+            $authUser = htmlspecialchars($_SERVER['HTTP_X_AUTH_USER'] ?? '');
+            $authPw   = htmlspecialchars($_SERVER['HTTP_X_AUTH_PASS'] ?? '');
+        }
+
         // Contrôle si les valeurs d'authentification sont identiques
-        return ($authUser === $expectedUser && $authPw === $expectedPw) ;
+        return ($authUser === $expectedUser && $authPw === $expectedPw);
     }    
  
     /**
