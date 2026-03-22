@@ -1,0 +1,8 @@
+# Désactiver le listing du répertoire
+Options -Indexes
+
+# Bloquer l'accès direct à tous les fichiers sauf backup_trigger.php
+<FilesMatch "^(?!backup_trigger\.php$)">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
