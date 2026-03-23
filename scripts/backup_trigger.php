@@ -11,7 +11,7 @@
 
 // ─── Protection par token ─────────────────────────────────────────────────────
 $token = $_GET['token'] ?? '';
-if ($token !== 'VOTRE_TOKEN_SECRET') {
+if ($token !== 'tokenmedia') {
     http_response_code(403);
     header('Content-Type: application/json');
     echo json_encode(['code' => 403, 'message' => 'Accès refusé']);
