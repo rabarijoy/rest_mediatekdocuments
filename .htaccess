@@ -2,16 +2,13 @@ Options +FollowSymLinks
 RewriteEngine on
 RewriteCond %{HTTP:Authorization} ^(.+)$
 RewriteRule ^(.*)$ - [E=HTTP_AUTHORIZATION:%1]
-# RewriteBase à adapter selon l'hébergeur :
-# - Si le domaine pointe vers le dossier REST lui-même (AwardSpace sous-domaine) : RewriteBase /
-# - Si le dossier REST est un sous-dossier de www/ : RewriteBase /rest_mediatekdocuments/
-RewriteBase /
+RewriteBase /rest_mediatekdocuments/
 
 # Laisser passer les accès directs au dossier scripts/ (backup_trigger.php)
 RewriteRule ^scripts/ - [L]
 
 # Refuser l'accès direct à la racine sans paramètre de route
-RewriteCond %{REQUEST_URI} ^/?$
+RewriteCond %{REQUEST_URI} ^/rest_mediatekdocuments/?$
 RewriteRule ^ - [R=400,L]
 
 # GET /table
